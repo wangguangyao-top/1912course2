@@ -12,8 +12,4 @@ class Index
     {
         return 'hello,' . $name;
     }
-    public function abc(){
-        echo 123;
-        return view('index@Index/index');
-    }
 }
