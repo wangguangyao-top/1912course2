@@ -30,6 +30,7 @@ class Hook extends Facade
      * @access protected
      * @return string
      */
+
     protected static function getFacadeClass()
     {
         return 'hook';
