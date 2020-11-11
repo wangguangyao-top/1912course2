@@ -1,7 +1,7 @@
 <?php
 namespace app\index\controller;
 
-class Admin
+class Index
 {
     public function index()
     {
@@ -11,9 +11,5 @@ class Admin
     public function hello($name = 'ThinkPHP5')
     {
         return 'hello,' . $name;
-    }
-    public function abc(){
-        echo "老吴又来了";
-        return view('index@Admin/index');
     }
 }
