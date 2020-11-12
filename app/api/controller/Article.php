@@ -4,6 +4,7 @@ namespace app\api\controller;
 use think\cache\driver\Redis;
 use app\api\model\message\MessageModel;
 use app\api\model\message\ActivityModel;
+use app\api\model\CourseModel;
 use think\Request;
 
 
@@ -41,6 +42,19 @@ class Article
      */
     public function activities(){
         $data=ActivityModel::where('is_del',1)->select();
+        if($data){
+            echo  json_encode(['error'=>200,'msg'=>'ok','data'=>$data]);
+            die;
+        }
+        echo  json_encode(['error'=>100001,'msg'=>'NO','data'=>$data]);
+        die;
+    }
+
+    /**
+     *
+     */
+    public function courseNew(){
+        $data=CourseModel::where('is_del',1)->order('course_id desc')->select();
         if($data){
             echo  json_encode(['error'=>200,'msg'=>'ok','data'=>$data]);
             die;
