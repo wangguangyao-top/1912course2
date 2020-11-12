@@ -30,5 +30,29 @@ class Bank extends Common
 
     }
 
+    public function bank(Request $request)
+    {
+
+        $cla_id=$request->post("cla_id");
+
+        //题库分类
+        $cla=ClassificationModel::where(["is_del"=>1])->select();
+
+        //题库
+        $bank=BankModel::
+        leftjoin("course_question_classification","course_question_bank.cla_id=course_question_classification.cla_id")
+            ->where(["course_question_bank.cla_id"=>$cla_id])
+            ->where(["course_question_bank.is_del"=>1])
+            ->select();
+        $data=[
+            "cla"=>$cla,
+            "bank"=>$bank,
+        ];
+        $data=json_encode($data,true);
+
+        return $data;
+
+    }
+
 
 }
