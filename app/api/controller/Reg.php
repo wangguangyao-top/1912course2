@@ -150,9 +150,9 @@ class Reg
     public function userReg(Request $request){
         $data=$request->post();
         $user_name=$data['user_name'];
-        $reg_name='/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z\u4e00-\u9fa5]{6,18}$/';
+        $reg_name='/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,18}$/';
         if(!preg_match($reg_name,$user_name)){
-            echo json_encode(['code'=>10013,'msg'=>'用户名由数字，字母，中文（6-18位）组成']);
+            echo json_encode(['code'=>10013,'msg'=>'用户名由数字，字母（6-18位）组成']);
             die;
         }
         $user_tel=$data['user_tel'];

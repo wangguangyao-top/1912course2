@@ -14,7 +14,7 @@ class Login
         $data=$request->post();
         $user_name=$data['user_name'];
         $user_pwd=$data['user_pwd'];
-        $ret_name='/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z\u4e00-\u9fa5]{6,18}$/';
+        $ret_name='/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,18}$/';
         $ret_tel='/^1(?:3\d|4[4-9]|5[0-35-9]|6[67]|7[013-8]|8\d|9\d)\d{8}$/';
         //判断是手机号登录还是用户名登录
         if(preg_match($ret_tel,$user_name)){
@@ -33,7 +33,6 @@ class Login
                 $this->loginOut($where,$user_pwd,$user_name);
             }
         }
-        $user_pwd=$data['user_pwd'];
     }
 
     /**
@@ -62,7 +61,7 @@ class Login
             echo json_encode(['code'=>10025,'msg'=>'由于你错误次数过多~账号被锁定1小时']);
             die;
         }
-        //判断密码是否正确
+        //判断密码是否
         if(!password_verify($user_pwd,$users['user_pwd'])){
             if(!$getUser){
                 $redis->setex($str,3600,1);
