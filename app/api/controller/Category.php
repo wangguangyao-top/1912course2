@@ -48,9 +48,20 @@ class Category extends Common
     //首页加载更多
     public function add(Request $request){
         $cate_id=$request->cate_id;
+        $number=$request->number??0;
+        $one=0+$number;
+        $end=4+$number;
         $where = [];
         $where[] = ['is_del','=',1];
-        $res = CourseModel::where($where)->limit(4,6)->select();
+        if($cate_id){
+            $where[] = ['cate_id','=',$cate_id];
+        }
+        $count=CourseModel::where($where)->count();
+        if($one>=$count){
+            $res = json_encode(1000);
+            return $res;
+        }
+        $res = CourseModel::where($where)->limit($one,$end)->select();
         $res = json_encode($res);
         return $res;
     }
