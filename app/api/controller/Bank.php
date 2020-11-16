@@ -6,6 +6,8 @@ use think\Request;
 use app\api\controller\Common;
 use app\api\model\BankModel;
 use app\api\model\ClassificationModel;
+use app\api\model\UbankModel;
+
 
 class Bank extends Common
 {
@@ -52,6 +54,13 @@ class Bank extends Common
 
         return $data;
 
+    }
+
+    public function userbank(){
+        $userbank = UbankModel::leftjoin('course_question_bank','course_user_bank.bank_id=course_question_bank.bank_id')
+            ->where('is_del',1)
+            ->select();
+        return json_encode($userbank,true);
     }
 
 
