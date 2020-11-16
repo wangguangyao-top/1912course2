@@ -16,6 +16,8 @@ class Article
      */
     public function articleIndex(Request $request){
         $data=MessageModel::where('is_del',1)->select();
+       // $pagi=$data->render();
+       // dump($pagi);die;
         if($data){
             echo  json_encode(['error'=>200,'msg'=>'ok','data'=>$data]);
             die;
@@ -76,7 +78,7 @@ class Article
      */
     public function courseNew(){
 
-            $data=CourseModel::where('is_del',1)->order('course_id desc')->select();
+            $data=CourseModel::where('is_del',1)->order('course_id desc')->limit(5)->select();
 
         if($data){
             echo  json_encode(['error'=>200,'msg'=>'ok','data'=>$data]);
