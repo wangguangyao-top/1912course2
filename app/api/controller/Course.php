@@ -4,6 +4,7 @@ use think\cache\driver\Redis;
 use think\Request;
 use app\api\model\course\CourseModel;
 use app\api\model\course\CourseCate;
+use app\api\model\course\CounrseLect;
 class Course
 {
     /**
@@ -62,6 +63,9 @@ class Course
         echo json_encode(['code'=>200,'msg'=>'OK','data'=>$arr]);
         die;
     }
+    /**
+     * 无限极分类
+     */
     public function infiniteCate($show,$pid=0){
         $arr=[];
         foreach ($show as $k=>$v) {
@@ -71,5 +75,48 @@ class Course
             }
         }
         return $arr;
+    }
+    public function courseInfo(Request $request){
+        $course_id=$request->post('course_id');
+        $redis=new Redis();
+        $redis_one=$redis->get('course_course'.$course_id);
+        if($redis_one){
+            $one=json_decode($redis_one,true);
+            $lectFind=$redis->get('course_lect'.$course_id);
+            $cateShow=$redis->get('course_cate'.$course_id);
+            if($lectFind) $lectFind=json_decode($lectFind,true);
+            if($cateShow) $cateShow=json_decode($cateShow,true);
+        }else{
+            $course=new CourseModel();
+            $where=[];
+            $where[]=['is_del','=',1];
+            $where[]=['course_id','=',$course_id];
+            $one=$course->where($where)->find();
+            if(!$one){
+                echo json_encode(['code'=>1000,'msg'=>'缺少参数']);
+                die;
+            }
+            $where1=[];
+            $where1[]=['is_del','=',1];
+            $where1[]=['lect_id','=',$one['lect_id']];
+            $lect=new CounrseLect();
+            $lectFind=$lect->where($where1)->find();
+            $cate=new CourseCate();
+            $where2=[];
+            $where2[]=['is_del','=',1];
+            $where2[]=['cate_id','=',$lectFind['cate_id']];
+            $cateShow=$cate->where($where2)->find();
+            $one['course_image']=trim($one['course_image'],',');
+            $json=json_encode($one);
+            $json2=json_encode($lectFind);
+            $json3=json_encode($cateShow);
+            $redis->setex('course_course'.$one['course_id'],86400,$json);
+            $redis->setex('course_lect'.$one['course_id'],86400,$json2);
+            $redis->setex('course_cate'.$one['course_id'],86400,$json3);
+        }
+        echo json_encode(['code'=>200,'msg'=>'OK','data'=>['course'=>$one,'lect'=>$lectFind,'cate'=>$cateShow]]);
+        die;
+
+
     }
 }
