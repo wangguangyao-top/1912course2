@@ -37,20 +37,9 @@ class Category extends Common
    //精品课程
     public function cate(Request $request){
         $cate_id=$request->cate_id;
-        $where=[];
-        $where[]=['is_del','=',1];
-        $where[]=['cate_id','=',$cate_id];
-        $course=new CourseModel();
-        $show=$course->where($where)->select();
-        $info=json_encode($show);
-        return $info;
-    }
-    //首页加载更多
-    public function add(Request $request){
-        $cate_id=$request->cate_id;
         $number=$request->number??0;
         $one=0+$number;
-        $end=4+$number;
+//        print_r($one);die;
         $where = [];
         $where[] = ['is_del','=',1];
         if($cate_id){
@@ -61,7 +50,28 @@ class Category extends Common
             $res = json_encode(1000);
             return $res;
         }
-        $res = CourseModel::where($where)->limit($one,$end)->select();
+        $course=new CourseModel();
+        $show=$course->where($where)->limit($one,4)->select();
+        $info=json_encode($show);
+        return $info;
+    }
+    //首页加载更多
+    public function add(Request $request){
+        $cate_id=$request->cate_id;
+        $number=$request->number??0;
+        $one=0+$number;
+//        print_r($one);die;
+        $where = [];
+        $where[] = ['is_del','=',1];
+        if($cate_id){
+            $where[] = ['cate_id','=',$cate_id];
+        }
+        $count=CourseModel::where($where)->count();
+        if($one>=$count){
+            $res = json_encode(1000);
+            return $res;
+        }
+        $res = CourseModel::where($where)->limit($one,4)->select();
         $res = json_encode($res);
         return $res;
     }
