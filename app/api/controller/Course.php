@@ -91,9 +91,21 @@ class Course
             $lectFind=$redis->get('course_lect'.$course_id);
             $cateShow=$redis->get('course_cate'.$course_id);
             $cateLog=$redis->get('course_cateLog'.$course_id);
-            if($lectFind) $lectFind=json_decode($lectFind,true);
-            if($cateShow) $cateShow=json_decode($cateShow,true);
-            if($cateLog) $cateLogFind=json_decode($cateLog,true);
+            if($lectFind){
+                $lectFind=json_decode($lectFind,true);
+            }else{
+                $lectFind=[];
+            }
+            if($cateShow) {
+                $cateShow = json_decode($cateShow, true);
+            }else{
+                $cateShow=[];
+            }
+            if($cateLog) {
+                $cateLogFind = json_decode($cateLog, true);
+            }else{
+                $cateLogFind=[];
+            }
         }else{
             $course=new CourseModel();
             $where=[];
