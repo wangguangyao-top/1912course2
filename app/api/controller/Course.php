@@ -5,6 +5,7 @@ use think\Request;
 use app\api\model\course\CourseModel;
 use app\api\model\course\CourseCate;
 use app\api\model\course\CounrseLect;
+use app\api\model\course\CourseCatalog;
 class Course
 {
     /**
@@ -78,43 +79,64 @@ class Course
     }
     public function courseInfo(Request $request){
         $course_id=$request->post('course_id');
+        if(!$course_id){
+            echo json_encode(['code'=>1000,'msg'=>'缺少参数']);
+            die;
+        }
         $redis=new Redis();
         $redis_one=$redis->get('course_course'.$course_id);
         if($redis_one){
             $one=json_decode($redis_one,true);
+            $one['course_image']=trim($one['course_image'],',');
             $lectFind=$redis->get('course_lect'.$course_id);
             $cateShow=$redis->get('course_cate'.$course_id);
+            $cateLog=$redis->get('course_cateLog'.$course_id);
             if($lectFind) $lectFind=json_decode($lectFind,true);
             if($cateShow) $cateShow=json_decode($cateShow,true);
+            if($cateLog) $cateLogFind=json_decode($cateLog,true);
         }else{
             $course=new CourseModel();
             $where=[];
             $where[]=['is_del','=',1];
             $where[]=['course_id','=',$course_id];
             $one=$course->where($where)->find();
-            if(!$one){
-                echo json_encode(['code'=>1000,'msg'=>'缺少参数']);
+            if($one){
+                $json=json_encode($one);
+            }else{
+                echo json_encode(['code'=>1000,'msg'=>'非法操作']);
                 die;
             }
+            $one['course_image']=trim($one['course_image'],',');
             $where1=[];
             $where1[]=['is_del','=',1];
             $where1[]=['lect_id','=',$one['lect_id']];
             $lect=new CounrseLect();
             $lectFind=$lect->where($where1)->find();
+            if($lectFind){
+                $json2=json_encode($lectFind);
+            }
             $cate=new CourseCate();
             $where2=[];
             $where2[]=['is_del','=',1];
             $where2[]=['cate_id','=',$lectFind['cate_id']];
             $cateShow=$cate->where($where2)->find();
-            $one['course_image']=trim($one['course_image'],',');
-            $json=json_encode($one);
-            $json2=json_encode($lectFind);
-            $json3=json_encode($cateShow);
+            if($cateShow){
+                $json3=json_encode($cateShow);
+            }
+            $where3=[];
+            $where3[]=['is_del','=',1];
+            $where3[]=['catalog_id','=',$one['catalog_id']];
+            $cateLog=new CourseCatalog();
+            $cateLogFind=$cateLog->where($where3)->find();
+            if($cateLogFind){
+                $json4=json_encode($cateLogFind);
+            }
             $redis->setex('course_course'.$one['course_id'],86400,$json);
             $redis->setex('course_lect'.$one['course_id'],86400,$json2);
             $redis->setex('course_cate'.$one['course_id'],86400,$json3);
+            $redis->setex('course_cateLog'.$one['course_id'],86400,$json4);
         }
-        echo json_encode(['code'=>200,'msg'=>'OK','data'=>['course'=>$one,'lect'=>$lectFind,'cate'=>$cateShow]]);
+        echo json_encode(['code'=>200,'msg'=>'OK','data'=>['course'=>$one,'lect'=>$lectFind,'cate'=>$cateShow,'cateLog'=>$cateLogFind]]);
         die;
 
 
